@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grad RSVP List</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Caveat:wght@700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  min-height: 100vh;
+  background-color: #6B0038;
+  background-image:
+    radial-gradient(circle at 15% 20%, #A0004A 0%, transparent 40%),
+    radial-gradient(circle at 85% 10%, #500025 0%, transparent 38%),
+    radial-gradient(circle at 50% 92%, #880040 0%, transparent 35%),
+    radial-gradient(circle at 4%  65%, #BB0055 0%, transparent 28%),
+    radial-gradient(circle at 96% 55%, #420018 0%, transparent 30%);
+  font-family: 'Fredoka One', cursive;
+  padding: 40px 20px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.10) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+}
+
+.card {
+  position: relative;
+  z-index: 1;
+  background: #fff;
+  border: 4px solid #FF1493;
+  border-radius: 24px;
+  padding: 30px 28px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 8px 8px 0 #FF1493, 13px 13px 0 #FFD700;
+}
+
+h1 {
+  font-family: 'Caveat', cursive;
+  font-size: 36px;
+  font-weight: 700;
+  color: #FF1493;
+  text-align: center;
+  margin-bottom: 4px;
+  text-shadow: 2px 2px 0 #FFD700;
+}
+
+.subtitle {
+  font-family: 'Caveat', cursive;
+  font-size: 17px;
+  color: #888;
+  text-align: center;
+  margin-bottom: 24px;
+  letter-spacing: 1px;
+}
+
+.counts {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.count-box {
+  flex: 1;
+  border-radius: 14px;
+  padding: 14px 10px;
+  text-align: center;
+}
+.count-box.yes { background: #f0fff0; border: 2px solid #22aa00; }
+.count-box.no  { background: #fff0f0; border: 2px solid #cc1100; }
+.count-box .num {
+  font-size: 36px;
+  line-height: 1;
+  display: block;
+}
+.count-box.yes .num { color: #22aa00; }
+.count-box.no  .num { color: #cc1100; }
+.count-box .lbl {
+  font-family: 'Caveat', cursive;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-top: 4px;
+  display: block;
+}
+.count-box.yes .lbl { color: #22aa00; }
+.count-box.no  .lbl { color: #cc1100; }
+
+.section-label {
+  font-family: 'Caveat', cursive;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #aaa;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.rsvp-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+  min-height: 40px;
+}
+
+.rsvp-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fafafa;
+  border: 1.5px solid #eee;
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+.rsvp-name {
+  font-size: 17px;
+  color: #1a1a1a;
+}
+
+.rsvp-badge {
+  font-family: 'Caveat', cursive;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+}
+.badge-yes { background: #e0ffe0; color: #22aa00; border: 1.5px solid #22aa00; }
+.badge-no  { background: #ffe0e0; color: #cc1100; border: 1.5px solid #cc1100; }
+
+.rsvp-time {
+  font-family: monospace;
+  font-size: 10px;
+  color: #ccc;
+  margin-top: 2px;
+}
+
+.empty-msg {
+  font-family: 'Caveat', cursive;
+  font-size: 18px;
+  color: #ccc;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.btn-clear {
+  display: block;
+  width: 100%;
+  background: none;
+  border: 2px dashed #ddd;
+  border-radius: 12px;
+  padding: 10px;
+  font-family: 'Caveat', cursive;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ccc;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.2s;
+}
+.btn-clear:hover { border-color: #cc1100; color: #cc1100; }
+
+.back-link {
+  margin-top: 28px;
+  font-family: 'Caveat', cursive;
+  font-size: 18px;
+  font-weight: 700;
+  color: #FFD0E8;
+  text-decoration: none;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(255,20,147,0.4);
+}
+.back-link:hover { color: #fff; }
+
+/* TODO banner */
+.todo-banner {
+  position: relative; z-index: 1;
+  background: rgba(255,215,0,0.15);
+  border: 2px dashed #FFD700;
+  border-radius: 14px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 480px;
+  font-family: 'Caveat', cursive;
+  font-size: 15px;
+  font-weight: 700;
+  color: #FFD0A0;
+  letter-spacing: 0.5px;
+  line-height: 1.5;
+}
+.todo-banner strong { color: #FFD700; }
+</style>
+</head>
+<body>
+
+<div class="todo-banner">
+  <strong>NOTE FOR LATER:</strong> RSVPs are currently saved in your browser's local storage.
+  When you hook up a real backend (post-exam!), replace the <code>loadRSVPs()</code> call
+  below with a fetch to your API and this page will show everyone's RSVPs live.
+</div>
+
+<div class="card">
+  <h1>RSVP List</h1>
+  <div class="subtitle">grad day · july 17 · 2026</div>
+
+  <div class="counts">
+    <div class="count-box yes">
+      <span class="num" id="countYes">0</span>
+      <span class="lbl">COMING</span>
+    </div>
+    <div class="count-box no">
+      <span class="num" id="countNo">0</span>
+      <span class="lbl">CANT MAKE IT</span>
+    </div>
+  </div>
+
+  <div class="section-label">Responses</div>
+  <ul class="rsvp-list" id="rsvpList">
+    <li class="empty-msg" id="emptyMsg">no RSVPs yet... share the link!</li>
+  </ul>
+
+  <button class="btn-clear" id="btnClear">clear all RSVPs</button>
+</div>
+
+<a class="back-link" href="index.html">back to invite</a>
+
+<script>
+const RSVP_KEY = 'grad_rsvp_list';
+
+function loadRSVPs() {
+  // TODO (post-exam): replace with fetch('/api/rsvps') or your backend call
+  try { return JSON.parse(localStorage.getItem(RSVP_KEY)) || []; }
+  catch { return []; }
+}
+
+function render() {
+  const list = loadRSVPs();
+  const listEl  = document.getElementById('rsvpList');
+  const emptyEl = document.getElementById('emptyMsg');
+  const yesEl   = document.getElementById('countYes');
+  const noEl    = document.getElementById('countNo');
+
+  const yes = list.filter(r => r.status === 'yes');
+  const no  = list.filter(r => r.status === 'no');
+
+  yesEl.textContent = yes.length;
+  noEl.textContent  = no.length;
+
+  // clear existing items (keep emptyMsg)
+  listEl.querySelectorAll('.rsvp-item').forEach(el => el.remove());
+
+  if (list.length === 0) {
+    emptyEl.style.display = 'block';
+    return;
+  }
+  emptyEl.style.display = 'none';
+
+  // sort: yes first, then by timestamp newest last
+  const sorted = [...list].sort((a,b) => {
+    if (a.status !== b.status) return a.status === 'yes' ? -1 : 1;
+    return new Date(a.timestamp) - new Date(b.timestamp);
+  });
+
+  sorted.forEach(r => {
+    const li = document.createElement('li');
+    li.className = 'rsvp-item';
+
+    const nameDiv = document.createElement('div');
+    const nameSpan = document.createElement('div');
+    nameSpan.className = 'rsvp-name';
+    nameSpan.textContent = r.name;
+
+    const timeSpan = document.createElement('div');
+    timeSpan.className = 'rsvp-time';
+    timeSpan.textContent = new Date(r.timestamp).toLocaleString('en-AU', {
+      day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'
+    });
+
+    nameDiv.appendChild(nameSpan);
+    nameDiv.appendChild(timeSpan);
+
+    const badge = document.createElement('span');
+    badge.className = 'rsvp-badge ' + (r.status === 'yes' ? 'badge-yes' : 'badge-no');
+    badge.textContent = r.status === 'yes' ? 'coming' : 'cant make it';
+
+    li.appendChild(nameDiv);
+    li.appendChild(badge);
+    listEl.appendChild(li);
+  });
+}
+
+document.getElementById('btnClear').addEventListener('click', () => {
+  if (confirm('Clear all RSVPs? This cannot be undone.')) {
+    localStorage.removeItem(RSVP_KEY);
+    render();
+  }
+});
+
+render();
+</script>
+</body>
+</html>

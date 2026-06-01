@@ -718,17 +718,25 @@ for (let i = 0; i < count; i++) {
   layer.appendChild(el);
 }
 
-// ── MESSAGE SEQUENCE (no emojis) ──────────────────────────────
-const sequence = [
-  { type:'send',  text:'omg babe r u free July 17?' },
-  { type:'reply', text:'YES why whats happening!!' },
-  { type:'send',  text:'only the most iconic day ever... ITS GRAD DAY!!' },
-  { type:'reply', text:'WAIT OMG NO WAY' },
-  { type:'send',  text:'ceremony @ UQ Centre 3PM!! lunch + photos + dinner after' },
-  { type:'reply', text:'I AM THERE!! charging my cam rn' },
-  { type:'send',  text:'ill text u more deets l8r' },
-];
+// ── RSVP STORAGE KEY ─────────────────────────────────────────
+// TODO (post-exam): swap localStorage calls with real backend API
+const RSVP_KEY = 'grad_rsvp_list';
 
+function loadRSVPs() {
+  try { return JSON.parse(localStorage.getItem(RSVP_KEY)) || []; }
+  catch { return []; }
+}
+
+function saveRSVP(name, status) {
+  const list = loadRSVPs();
+  // avoid duplicates by name (case-insensitive)
+  const existing = list.findIndex(r => r.name.toLowerCase() === name.toLowerCase());
+  const entry = { name, status, timestamp: new Date().toISOString() };
+  if (existing >= 0) list[existing] = entry; else list.push(entry);
+  localStorage.setItem(RSVP_KEY, JSON.stringify(list));
+}
+
+// ── SCREEN HELPERS ───────────────────────────────────────────
 const track     = document.getElementById('screenTrack');
 const indicator = document.getElementById('typingIndicator');
 const bodyEl    = track.parentElement;
@@ -747,6 +755,15 @@ function pinToBottom() {
   }
 }
 
+function addBubble(type, text) {
+  const b = document.createElement('div');
+  b.className = type === 'send' ? 'msg-bubble' : 'msg-reply';
+  b.textContent = text;
+  track.insertBefore(b, indicator);
+  pinToBottom();
+  return b;
+}
+
 async function typeInto(el, text, speed) {
   for (let i = 0; i <= text.length; i++) {
     el.textContent = text.slice(0, i);
@@ -755,27 +772,136 @@ async function typeInto(el, text, speed) {
   }
 }
 
+async function sendMessage(type, text, speed = 44) {
+  indicator.innerHTML = 'typing...<span class="cursor"></span>';
+  pinToBottom();
+  await pause(type === 'reply' ? 700 : 480);
+  const b = document.createElement('div');
+  b.className = type === 'send' ? 'msg-bubble' : 'msg-reply';
+  b.textContent = '';
+  track.insertBefore(b, indicator);
+  indicator.innerHTML = '<span class="cursor"></span>';
+  await typeInto(b, text, speed);
+  pinToBottom();
+  return b;
+}
+
+// ── INTRO SEQUENCE ───────────────────────────────────────────
+const introSequence = [
+  { type:'send',  text:'omg babe r u free July 17?' },
+  { type:'reply', text:'YES why whats happening!!' },
+  { type:'send',  text:'only the most iconic day ever... ITS GRAD DAY!!' },
+  { type:'reply', text:'WAIT OMG NO WAY' },
+  { type:'send',  text:'ceremony @ UQ Centre 3PM - lunch + photos + dinner after' },
+  { type:'reply', text:'I AM THERE!! charging my cam rn' },
+  { type:'send',  text:'ill text u more deets l8r - but first... r u coming??' },
+];
+
+// ── RSVP INPUT ───────────────────────────────────────────────
+function showRSVPInput() {
+  // remove typing indicator
+  indicator.innerHTML = '';
+
+  // build a mini input row inside the screen-track
+  const inputRow = document.createElement('div');
+  inputRow.id = 'rsvp-input-row';
+  inputRow.style.cssText = `
+    display:flex; gap:4px; align-items:center;
+    padding: 3px 0 2px;
+    flex-shrink:0;
+  `;
+
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.placeholder = 'ur name...';
+  inp.maxLength = 30;
+  inp.style.cssText = `
+    flex:1; font-family:monospace; font-size:10px;
+    background:#1e3800; color:#b8df8a;
+    border:1px solid #4a8814; border-radius:4px;
+    padding:3px 5px; outline:none;
+    min-width:0;
+  `;
+
+  const sendBtn = document.createElement('button');
+  sendBtn.textContent = 'YES';
+  sendBtn.style.cssText = `
+    font-family:monospace; font-size:9px; font-weight:bold;
+    background:#4a8814; color:#0a1e00;
+    border:1px solid #2a5000; border-radius:4px;
+    padding:3px 5px; cursor:pointer; flex-shrink:0;
+  `;
+
+  const noBtn = document.createElement('button');
+  noBtn.textContent = 'NO';
+  noBtn.style.cssText = `
+    font-family:monospace; font-size:9px; font-weight:bold;
+    background:#660010; color:#ffaaaa;
+    border:1px solid #440008; border-radius:4px;
+    padding:3px 5px; cursor:pointer; flex-shrink:0;
+  `;
+
+  inputRow.appendChild(inp);
+  inputRow.appendChild(sendBtn);
+  inputRow.appendChild(noBtn);
+  track.appendChild(inputRow);
+  pinToBottom();
+  inp.focus();
+
+  // prompt bubble above the input
+  const prompt = document.createElement('div');
+  prompt.className = 'msg-bubble';
+  prompt.textContent = 'type ur name + tap YES or NO';
+  prompt.style.fontSize = '9.5px';
+  track.insertBefore(prompt, inputRow);
+  pinToBottom();
+
+  async function handleRSVP(attending) {
+    const name = inp.value.trim() || 'mystery guest';
+    inputRow.remove();
+    prompt.remove();
+
+    // show their reply bubble
+    addBubble('reply', attending
+      ? name + ' - ill be there!!'
+      : name + ' - cant make it :('
+    );
+
+    await pause(400);
+    saveRSVP(name, attending ? 'yes' : 'no');
+
+    if (attending) {
+      await sendMessage('send', 'YESSS omg I cant wait to see u there!!', 40);
+      await pause(600);
+      await sendMessage('send', 'more deets coming soon - watch this space', 40);
+    } else {
+      await sendMessage('send', 'nooo we will miss u!! ill send pics after', 40);
+    }
+
+    await pause(500);
+    indicator.innerHTML = '';
+    pinToBottom();
+  }
+
+  sendBtn.addEventListener('click', () => handleRSVP(true));
+  noBtn.addEventListener('click',  () => handleRSVP(false));
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleRSVP(true);
+  });
+}
+
+// ── RUN ──────────────────────────────────────────────────────
 async function run() {
   await pause(1300);
-  for (let i = 0; i < sequence.length; i++) {
-    const { type, text } = sequence[i];
-
-    indicator.innerHTML = 'typing...<span class="cursor"></span>';
-    pinToBottom();
-    await pause(type === 'reply' ? 700 : 480);
-
-    const bubble = document.createElement('div');
-    bubble.className = type === 'send' ? 'msg-bubble' : 'msg-reply';
-    track.insertBefore(bubble, indicator);
-    indicator.innerHTML = '<span class="cursor"></span>';
-
-    await typeInto(bubble, text, type === 'reply' ? 50 : 42);
-
-    pinToBottom();
-    await pause(i === sequence.length - 1 ? 400 : 800);
+  for (let i = 0; i < introSequence.length; i++) {
+    const { type, text } = introSequence[i];
+    await sendMessage(type, text);
+    await pause(i === introSequence.length - 1 ? 500 : 800);
   }
   indicator.innerHTML = '';
   pinToBottom();
+  await pause(600);
+  showRSVPInput();
 }
 
 run();
