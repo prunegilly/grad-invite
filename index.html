@@ -854,11 +854,12 @@ function t9PressKey(keyEl) {
     return;
   }
 
-  // # = confirm name, move to yes/no
+  // # = confirm name and RSVP yes immediately
   if (k === '#') {
     clearTimeout(t9Timer);
     t9CommitPending();
-    if (t9Name.trim().length > 0) t9ConfirmName();
+    const name = t9Name.trim();
+    if (name.length > 0) t9Submit(name, true);
     return;
   }
 
@@ -902,59 +903,17 @@ function t9FlashKey(keyEl) {
   setTimeout(() => { keyEl.style.filter = ''; }, 120);
 }
 
-async function t9ConfirmName() {
-  // switch to yes/no phase
-  t9Phase = 'rsvp';
-  const name = t9Name.trim() || 'mystery guest';
-
-  // update screen display to show full name cleanly
-  t9DisplayEl.innerHTML = escapeHtml(name);
-  pinToBottom();
-
-  await pause(300);
-
-  // update softkeys and screen prompt
-  document.getElementById('skLeft').textContent  = 'YES';
-  document.getElementById('skRight').textContent = 'NO';
-  document.getElementById('skeyLeft').textContent  = 'YES';
-  document.getElementById('skeyRight').textContent = 'NO';
-
-  // swap prompt text
-  const promptEl = document.getElementById('t9Prompt');
-  if (promptEl) promptEl.textContent = 'coming to grad day?';
-  pinToBottom();
-
-  // wire up yes/no — softkey divs AND call/end buttons
-  function handleYes() { if (t9Phase === 'rsvp') t9Submit(name, true); }
-  function handleNo()  { if (t9Phase === 'rsvp') t9Submit(name, false); }
-
-  document.getElementById('skeyLeft').onclick  = handleYes;
-  document.getElementById('skLeft').onclick    = handleYes;
-  document.getElementById('btnCall').onclick   = handleYes;
-  document.getElementById('skeyRight').onclick = handleNo;
-  document.getElementById('skRight').onclick   = handleNo;
-  document.getElementById('btnEnd').onclick    = handleNo;
-}
-
 async function t9Submit(name, attending) {
   t9Active = false;
   t9Phase  = 'done';
-
-  // reset softkeys
-  document.getElementById('skLeft').textContent   = 'Options';
-  document.getElementById('skRight').textContent  = 'Back';
-  document.getElementById('skeyLeft').textContent = 'MENU';
-  document.getElementById('skeyRight').textContent= 'CLR';
-  document.getElementById('skeyLeft').onclick  = null;
-  document.getElementById('skeyRight').onclick = null;
-  document.getElementById('skLeft').onclick    = null;
-  document.getElementById('skRight').onclick   = null;
-  document.getElementById('btnCall').onclick   = null;
-  document.getElementById('btnEnd').onclick    = null;
+  clearTimeout(t9Timer);
+  document.removeEventListener('keydown', t9PhysicalKey);
 
   // remove the typing UI
   const ui = document.getElementById('t9UI');
   if (ui) ui.remove();
+  const prompt = document.getElementById('t9Prompt');
+  if (prompt) prompt.remove();
 
   // show their reply
   addBubble('reply', attending
@@ -985,7 +944,7 @@ function showRSVPInput() {
   const prompt = document.createElement('div');
   prompt.id = 't9Prompt';
   prompt.className = 'msg-bubble';
-  prompt.textContent = 'type ur name using the keys';
+  prompt.textContent = 'type ur name + press # to send';
   prompt.style.fontSize = '9px';
   track.insertBefore(prompt, indicator);
 
