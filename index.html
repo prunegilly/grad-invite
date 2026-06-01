@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OMG U R INVITED!!</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Caveat:wght@700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  min-height: 100vh;
+  background-color: #6B0038;
+  background-image:
+    radial-gradient(circle at 15% 20%, #A0004A 0%, transparent 40%),
+    radial-gradient(circle at 85% 10%, #500025 0%, transparent 38%),
+    radial-gradient(circle at 50% 92%, #880040 0%, transparent 35%),
+    radial-gradient(circle at 4%  65%, #BB0055 0%, transparent 28%),
+    radial-gradient(circle at 96% 55%, #420018 0%, transparent 30%),
+    radial-gradient(circle at 50% 45%, #780035 0%, transparent 50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  cursor: none;
+  min-height: 100dvh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.10) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── BG EMOJI ── */
+.ld {
+  position: fixed;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+  line-height: 1;
+}
+
+@keyframes fl1 { 0%,100%{transform:translateY(0) rotate(-7deg)}  50%{transform:translateY(-20px) rotate(7deg)} }
+@keyframes fl2 { 0%,100%{transform:translateY(0) rotate(9deg)}   50%{transform:translateY(-15px) rotate(-6deg)} }
+@keyframes fl3 { 0%,100%{transform:translateY(0) rotate(-4deg)}  50%{transform:translateY(-24px) rotate(5deg)} }
+@keyframes fl4 { 0%,100%{transform:translateY(0) rotate(6deg)}   50%{transform:translateY(-12px) rotate(-9deg)} }
+@keyframes spin    { to { transform: rotate(360deg); } }
+@keyframes spinrev { to { transform: rotate(-360deg); } }
+@keyframes pulse   { 0%,100%{opacity:0.45;transform:scale(1)} 50%{opacity:0.8;transform:scale(1.2)} }
+
+
+
+/* ══════════════════════════════════════════
+   MOTOROLA RAZR V3 — PINK — REALISTIC CSS
+   ══════════════════════════════════════════ */
+
+/* Overall phone shadow + float */
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes phoneBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+.phone-wrap {
+  position: relative; z-index: 10;
+  display: flex; flex-direction: column; align-items: center;
+  filter:
+    drop-shadow(0 40px 60px rgba(0,0,0,0.7))
+    drop-shadow(0 0 40px rgba(255,20,147,0.35))
+    drop-shadow(4px 4px 0 rgba(0,0,0,0.3));
+  opacity: 0;
+  animation: fadeUp 0.9s ease forwards 0.3s, phoneBob 5s ease-in-out 1.5s infinite;
+}
+
+/* ── TOP LID ──────────────────────────────── */
+.phone-top {
+  width: 220px;
+  background:
+    linear-gradient(130deg,
+      #FF85C8 0%,
+      #FF2BA0 15%,
+      #E8007A 35%,
+      #FF1493 55%,
+      #D4006E 72%,
+      #FF3DAA 88%,
+      #FF85C8 100%);
+  border-radius: 28px 28px 4px 4px;
+  padding: 14px 14px 8px;
+  border: 1.5px solid #FF90D8;
+  border-bottom: none;
+  position: relative;
+  /* gloss sheen */
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 1px 0 0 rgba(255,255,255,0.2),
+    inset -1px 0 0 rgba(0,0,0,0.15),
+    inset 0 -2px 6px rgba(0,0,0,0.25),
+    2px 0 0 #AA0055,
+    -2px 0 0 #AA0055;
+}
+
+/* gloss highlight stripe */
+.phone-top::before {
+  content: '';
+  position: absolute;
+  top: 6px; left: 14px; right: 14px;
+  height: 40%;
+  border-radius: 20px 20px 50% 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0) 100%);
+  pointer-events: none;
+}
+
+/* earpiece + camera row */
+.phone-ear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.earpiece {
+  width: 52px; height: 6px;
+  border-radius: 3px;
+  background: repeating-linear-gradient(90deg, #7A0035 0, #7A0035 2px, #FF60A8 2px, #FF60A8 4px);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.camera-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 33% 33%, #4a2060, #0a0010);
+  border: 1.5px solid #AA0055;
+  box-shadow: 0 0 0 1.5px rgba(255,255,255,0.2), 0 0 6px rgba(100,0,200,0.4);
+  flex-shrink: 0;
+}
+
+/* ── SCREEN AREA ── */
+.screen-bezel {
+  background: #0d0005;
+  border-radius: 10px;
+  padding: 4px 4px 4px;
+  border: 2px solid #660028;
+  box-shadow:
+    inset 0 3px 12px rgba(0,0,0,0.95),
+    inset 0 0 6px rgba(150,0,60,0.3),
+    0 0 0 1px rgba(255,100,180,0.1);
+}
+
+.screen {
+  background: #b8df8a;
+  border-radius: 7px;
+  width: 188px;
+  height: 196px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  /* subtle inner glow of the LCD */
+  box-shadow: inset 0 0 20px rgba(100,180,0,0.15);
+}
+
+/* LCD pixel texture */
+.screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.04) 2px,
+    rgba(0,0,0,0.04) 3px
+  );
+  pointer-events: none;
+  border-radius: 7px;
+}
+
+.screen-status {
+  background: #4e8a18;
+  padding: 3px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  border-bottom: 1px solid #3a6a10;
+}
+.screen-status span { font-family:monospace; font-size:8.5px; color:#0e2600; letter-spacing:0.5px; font-weight:bold; }
+.sig-bars { display:inline-flex; gap:1.5px; align-items:flex-end; }
+.sig-bars i { width:3px; background:#0e2600; display:block; border-radius:1px; }
+
+.screen-carrier {
+  text-align: center;
+  font-family: monospace;
+  font-size: 9px;
+  color: #1e4800;
+  background: #a8d070;
+  padding: 2px 0 3px;
+  letter-spacing: 2px;
+  font-weight: bold;
+  flex-shrink: 0;
+  border-bottom: 1px solid #78b030;
+}
+
+.screen-body {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  background: #b8df8a;
+}
+
+.screen-track {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 6px 8px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.msg-bubble {
+  background: #1e3800;
+  color: #b8df8a;
+  border-radius: 8px 8px 8px 2px;
+  padding: 5px 8px;
+  font-family: monospace;
+  font-size: 10.5px;
+  line-height: 1.4;
+  max-width: 84%;
+  word-break: break-word;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.msg-reply {
+  background: #4a8814;
+  color: #0a1e00;
+  border-radius: 8px 8px 2px 8px;
+  padding: 5px 8px;
+  font-family: monospace;
+  font-size: 10.5px;
+  line-height: 1.4;
+  max-width: 80%;
+  word-break: break-word;
+  flex-shrink: 0;
+  align-self: flex-end;
+}
+
+.typing-indicator {
+  font-family: monospace;
+  font-size: 9.5px;
+  color: #2a5000;
+  font-style: italic;
+  flex-shrink: 0;
+  min-height: 14px;
+  align-self: flex-start;
+}
+
+.cursor {
+  display: inline-block;
+  width: 6px; height: 10px;
+  background: #1e3800;
+  margin-left: 1px;
+  vertical-align: middle;
+  animation: blink 0.65s step-end infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+.screen-softkeys {
+  background: #3a7010;
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 10px;
+  font-family: monospace;
+  font-size: 8px;
+  color: #a8d070;
+  border-top: 1px solid #285008;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+
+/* ── HINGE ── thick chrome band, the RAZR signature */
+.phone-hinge {
+  width: 228px;
+  height: 18px;
+  position: relative;
+  z-index: 5;
+  background: linear-gradient(to bottom,
+    #880040 0%,
+    #CC0060 8%,
+    #FF60A8 22%,
+    #FFB0D8 38%,
+    #ffffff 50%,
+    #FFB0D8 62%,
+    #FF60A8 78%,
+    #CC0060 92%,
+    #880040 100%);
+  box-shadow:
+    0 3px 8px rgba(0,0,0,0.5),
+    0 -2px 4px rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.4);
+}
+
+/* hinge pivot barrels on left and right */
+.phone-hinge::before,
+.phone-hinge::after {
+  content: '';
+  position: absolute;
+  top: 50%; transform: translateY(-50%);
+  width: 22px; height: 18px;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #FFD0E8 0%, #FF80B8 40%, #AA0055 100%);
+  border: 1px solid #880040;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.4);
+}
+.phone-hinge::before { left: 12px; }
+.phone-hinge::after  { right: 12px; }
+
+/* ── BOTTOM BODY ─────────────────────────────── */
+.phone-bottom {
+  width: 220px;
+  background:
+    linear-gradient(130deg,
+      #FF85C8 0%,
+      #FF2BA0 15%,
+      #E8007A 35%,
+      #FF1493 55%,
+      #D4006E 72%,
+      #FF3DAA 88%,
+      #FF85C8 100%);
+  border-radius: 4px 4px 30px 30px;
+  padding: 10px 14px 24px;
+  border: 1.5px solid #FF90D8;
+  border-top: none;
+  position: relative;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.3),
+    inset 1px 0 0 rgba(255,255,255,0.15),
+    inset -1px 0 0 rgba(0,0,0,0.12),
+    inset 0 -3px 10px rgba(0,0,0,0.3),
+    2px 0 0 #AA0055,
+    -2px 0 0 #AA0055,
+    2px 8px 0 #880040,
+    -2px 8px 0 #880040,
+    0 10px 0 #660030;
+}
+
+/* gloss sheen on bottom */
+.phone-bottom::before {
+  content: '';
+  position: absolute;
+  top: 6px; left: 14px; right: 14px;
+  height: 30%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 100%);
+  pointer-events: none;
+}
+
+/* ── NAVIGATION CLUSTER ── call / nav-ring / end */
+.nav-cluster {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+/* Green call button */
+.btn-call {
+  width: 44px; height: 22px;
+  border-radius: 11px;
+  background: linear-gradient(180deg, #66EE44, #22AA00);
+  border: 1.5px solid #119900;
+  box-shadow: 0 3px 0 #006600, inset 0 1px 2px rgba(255,255,255,0.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+}
+
+/* Red end button */
+.btn-end {
+  width: 44px; height: 22px;
+  border-radius: 11px;
+  background: linear-gradient(180deg, #FF5533, #CC1100);
+  border: 1.5px solid #990000;
+  box-shadow: 0 3px 0 #660000, inset 0 1px 2px rgba(255,255,255,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+}
+
+/* Directional pad ring */
+.dpad-ring {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, #AA0055 0%, #880040 40%, #660030 100%);
+  border: 2px solid #CC0066;
+  box-shadow:
+    0 3px 0 #440020,
+    inset 0 1px 4px rgba(255,255,255,0.2),
+    inset 0 -1px 4px rgba(0,0,0,0.4);
+  position: relative;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Cross lines on dpad */
+.dpad-ring::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 38%, #FF60A8, #990044);
+  box-shadow: inset 0 1px 3px rgba(255,255,255,0.3);
+}
+
+/* Arrow indicators */
+.dpad-arrows {
+  position: relative; z-index: 1;
+  font-size: 8px;
+  color: rgba(255,220,240,0.8);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  width: 36px; height: 36px;
+  place-items: center;
+  font-family: monospace;
+}
+
+/* ── SOFTKEY ROW ── (above keypad) */
+.softkey-row {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 7px;
+}
+
+.skey {
+  flex: 1;
+  height: 18px;
+  border-radius: 9px;
+  border: 1.5px solid rgba(255,255,255,0.3);
+  box-shadow: 0 2.5px 0 rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.25);
+  font-family: monospace;
+  font-size: 7px;
+  color: rgba(255,255,255,0.85);
+  display: flex; align-items: center; justify-content: center;
+  letter-spacing: 0.5px;
+}
+.skey-l { background: linear-gradient(180deg, #FF80B8, #CC0060); }
+.skey-m { background: linear-gradient(180deg, #CCCCCC, #888888); border-radius: 50%; width: 18px; flex: none; }
+.skey-r { background: linear-gradient(180deg, #FF80B8, #CC0060); }
+
+/* ── NUMERIC KEYPAD ── */
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.key {
+  border-radius: 6px;
+  height: 26px;
+  border: 1px solid rgba(255,180,220,0.4);
+  box-shadow:
+    0 3px 0 rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.30),
+    inset 0 -1px 0 rgba(0,0,0,0.15);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 0;
+  background: linear-gradient(175deg,
+    rgba(255,160,210,0.55) 0%,
+    rgba(200,0,90,0.70) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* gloss pip on each key */
+.key::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 4px; right: 4px;
+  height: 40%;
+  border-radius: 3px 3px 50% 50%;
+  background: rgba(255,255,255,0.20);
+}
+
+.key-num  {
+  font-family: 'Fredoka One', cursive;
+  font-size: 13px; color: #fff;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+.key-abc  {
+  font-family: monospace;
+  font-size: 6px; color: rgba(255,210,235,0.9);
+  line-height: 1; letter-spacing: 0.5px;
+}
+.key-sym  {
+  font-family: monospace;
+  font-size: 14px; color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+/* ── LABEL ── */
+.landing-label {
+  position: relative; z-index: 10;
+  font-family: 'Caveat', cursive;
+  font-size: 18px; font-weight: 700;
+  color: #FFCCE8;
+  letter-spacing: 3px;
+  margin-bottom: 20px;
+  opacity: 0;
+  animation: fadeUp 0.6s ease forwards 0.15s;
+  text-shadow: 0 0 14px rgba(255,20,147,0.55);
+}
+
+/* ── STAR CURSOR ── */
+* { cursor: none !important; }
+
+#star-cursor {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  font-size: 26px;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 0 6px rgba(255,215,0,0.9)) drop-shadow(0 0 12px rgba(255,20,147,0.6));
+  transition: transform 0.05s ease;
+  user-select: none;
+}
+
+.trail-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9998;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: trailFade 0.7s ease-out forwards;
+}
+
+@keyframes trailFade {
+  0%   { opacity: 1;   transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0;   transform: translate(-50%, calc(-50% - 18px)) scale(0.1); }
+}
+
+/* ── CONFETTI ── */
+.confetti-piece {
+  position: fixed;
+  pointer-events: none;
+  z-index: 2;
+  animation: confettiFall linear infinite;
+}
+@keyframes confettiFall {
+  0%   { transform: translateY(-30px) rotate(0deg);  opacity: 1; }
+  100% { transform: translateY(110vh) rotate(800deg); opacity: 0.15; }
+}
+</style>
+</head>
+<body>
+
+<!-- BG EMOJIS injected by JS for maximum chaos -->
+<div id="bgLayer"></div>
+<div id="star-cursor">⭐</div>
+
+<div class="landing-label">1 new message</div>
+
+<div class="phone-wrap">
+
+  <!-- ══ TOP LID ══ -->
+  <div class="phone-top">
+    <div class="phone-ear">
+      <div class="earpiece"></div>
+      <div class="camera-dot"></div>
+    </div>
+    <div class="screen-bezel">
+      <div class="screen">
+        <div class="screen-status">
+          <span>
+            <span class="sig-bars">
+              <i style="height:3px"></i><i style="height:5px"></i>
+              <i style="height:7px"></i><i style="height:9px"></i>
+            </span>
+            &nbsp;MOTO
+          </span>
+          <span>11:17</span>
+          <span>▮▮▮▯</span>
+        </div>
+        <div class="screen-carrier">MSGS (1 NEW)</div>
+        <div class="screen-body">
+          <div class="screen-track" id="screenTrack">
+            <div class="typing-indicator" id="typingIndicator"><span class="cursor"></span></div>
+          </div>
+        </div>
+        <div class="screen-softkeys"><span>Options</span><span>Back</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ HINGE ══ -->
+  <div class="phone-hinge"></div>
+
+  <!-- ══ BOTTOM BODY ══ -->
+  <div class="phone-bottom">
+
+    <!-- Call / D-Pad / End row -->
+    <div class="nav-cluster">
+      <div class="btn-call">📞</div>
+      <div class="dpad-ring">
+        <div class="dpad-arrows">
+          <span></span><span>▲</span><span></span>
+          <span>◀</span><span></span><span>▶</span>
+          <span></span><span>▼</span><span></span>
+        </div>
+      </div>
+      <div class="btn-end">📵</div>
+    </div>
+
+    <!-- Softkey row -->
+    <div class="softkey-row">
+      <div class="skey skey-l">MENU</div>
+      <div class="skey skey-m"></div>
+      <div class="skey skey-r">CLR</div>
+    </div>
+
+    <!-- Numeric keypad -->
+    <div class="keypad">
+      <div class="key"><span class="key-num">1</span><span class="key-abc">. @ ?</span></div>
+      <div class="key"><span class="key-num">2</span><span class="key-abc">A B C</span></div>
+      <div class="key"><span class="key-num">3</span><span class="key-abc">D E F</span></div>
+      <div class="key"><span class="key-num">4</span><span class="key-abc">G H I</span></div>
+      <div class="key"><span class="key-num">5</span><span class="key-abc">J K L</span></div>
+      <div class="key"><span class="key-num">6</span><span class="key-abc">M N O</span></div>
+      <div class="key"><span class="key-num">7</span><span class="key-abc">P Q R S</span></div>
+      <div class="key"><span class="key-num">8</span><span class="key-abc">T U V</span></div>
+      <div class="key"><span class="key-num">9</span><span class="key-abc">W X Y Z</span></div>
+      <div class="key"><span class="key-sym">*</span></div>
+      <div class="key"><span class="key-num">0</span><span class="key-abc">+ space</span></div>
+      <div class="key"><span class="key-sym">#</span></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+// ── BACKGROUND EMOJI CHAOS ──────────────────────────────────
+const pool = [
+  '🎀','🎀','🎀',
+  '🦋','🦋',
+  '💿','💿','💿',
+  '🪩','🪩','🪩',
+  '⭐','⭐','✨','✨','💫',
+  '💎','💎',
+  '💅','💅',
+  '🌸','🌺',
+  '💋','💋',
+  '🎵','🎶',
+  '🍾','🥂',
+  '👑','👑',
+  '🕺','💃',
+  '🎉','🎊','🎊',
+  '🌟','🌟',
+  '💕','💕','💖','💗',
+  '🪄','🪄',
+  '📲','📱',
+  '🔮',
+  '🫧',
+  '🎓','🎓',
+];
+
+const anims  = ['fl1','fl2','fl3','fl4','spin','spinrev','pulse'];
+const fls    = `
+@keyframes fl1 { 0%,100%{transform:translateY(0) rotate(-7deg)}50%{transform:translateY(-20px) rotate(7deg)} }
+@keyframes fl2 { 0%,100%{transform:translateY(0) rotate(9deg)}50%{transform:translateY(-15px) rotate(-6deg)} }
+@keyframes fl3 { 0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-24px) rotate(5deg)} }
+@keyframes fl4 { 0%,100%{transform:translateY(0) rotate(6deg)}50%{transform:translateY(-12px) rotate(-9deg)} }
+@keyframes spin { to{transform:rotate(360deg)} }
+@keyframes spinrev { to{transform:rotate(-360deg)} }
+@keyframes pulse { 0%,100%{opacity:0.45;transform:scale(1)}50%{opacity:0.82;transform:scale(1.25)} }
+`;
+const styleEl = document.createElement('style');
+styleEl.textContent = fls;
+document.head.appendChild(styleEl);
+
+const layer = document.getElementById('bgLayer');
+const count = 70;
+
+for (let i = 0; i < count; i++) {
+  const el = document.createElement('div');
+  el.className = 'ld';
+  el.textContent = pool[Math.floor(Math.random() * pool.length)];
+
+  const sz   = 24 + Math.floor(Math.random() * 38); // 24–62px
+  const top  = Math.random() * 100;
+  const left = Math.random() * 100;
+  const op   = 0.38 + Math.random() * 0.42;
+  const anim = anims[Math.floor(Math.random() * anims.length)];
+  const dur  = (3.5 + Math.random() * 6).toFixed(1);
+  const del  = (Math.random() * 4).toFixed(1);
+
+  el.style.cssText = `
+    position:fixed;
+    pointer-events:none;
+    user-select:none;
+    z-index:1;
+    line-height:1;
+    font-size:${sz}px;
+    top:${top}%;
+    left:${left}%;
+    opacity:${op};
+    animation:${anim} ${dur}s ease-in-out ${del}s infinite;
+  `;
+  layer.appendChild(el);
+}
+
+// ── MESSAGE SEQUENCE (no emojis) ──────────────────────────────
+const sequence = [
+  { type:'send',  text:'omg babe r u free July 17?' },
+  { type:'reply', text:'YES why whats happening!!' },
+  { type:'send',  text:'only the most iconic day ever... ITS GRAD DAY!!' },
+  { type:'reply', text:'WAIT OMG NO WAY' },
+  { type:'send',  text:'ceremony @ UQ Centre 3PM!! lunch + photos + dinner after' },
+  { type:'reply', text:'I AM THERE!! charging my cam rn' },
+  { type:'send',  text:'ill text u more deets l8r' },
+];
+
+const track     = document.getElementById('screenTrack');
+const indicator = document.getElementById('typingIndicator');
+const bodyEl    = track.parentElement;
+
+function pause(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function pinToBottom() {
+  const bh = bodyEl.clientHeight;
+  const th = track.scrollHeight;
+  if (th > bh) {
+    track.style.bottom = 'auto';
+    track.style.top    = (bh - th) + 'px';
+  } else {
+    track.style.bottom = '0';
+    track.style.top    = 'auto';
+  }
+}
+
+async function typeInto(el, text, speed) {
+  for (let i = 0; i <= text.length; i++) {
+    el.textContent = text.slice(0, i);
+    pinToBottom();
+    await pause(speed + Math.random() * 25);
+  }
+}
+
+async function run() {
+  await pause(1300);
+  for (let i = 0; i < sequence.length; i++) {
+    const { type, text } = sequence[i];
+
+    indicator.innerHTML = 'typing...<span class="cursor"></span>';
+    pinToBottom();
+    await pause(type === 'reply' ? 700 : 480);
+
+    const bubble = document.createElement('div');
+    bubble.className = type === 'send' ? 'msg-bubble' : 'msg-reply';
+    track.insertBefore(bubble, indicator);
+    indicator.innerHTML = '<span class="cursor"></span>';
+
+    await typeInto(bubble, text, type === 'reply' ? 50 : 42);
+
+    pinToBottom();
+    await pause(i === sequence.length - 1 ? 400 : 800);
+  }
+  indicator.innerHTML = '';
+  pinToBottom();
+}
+
+run();
+
+// ── STAR CURSOR + CONFETTI TRAIL ─────────────────────────────
+const starCursor = document.getElementById('star-cursor');
+const trailCols  = ['#FF1493','#FFD700','#FF69B4','#FF8C00','#DA70D6','#00BFFF','#ADFF2F','#FFE066','#FF85C2','#7DF9FF','#fff'];
+const trailEmoji = ['✨','💫','⭐','🌟','💖','💎','🎀','💅','🦋'];
+
+let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+let lastTrailX = mx, lastTrailY = my;
+let lastTrailTime = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX;
+  my = e.clientY;
+  starCursor.style.left = mx + 'px';
+  starCursor.style.top  = my + 'px';
+
+  const now = Date.now();
+  const dist = Math.hypot(mx - lastTrailX, my - lastTrailY);
+
+  // spawn a trail particle every ~12px of movement, throttled to ~60fps
+  if (dist > 12 && now - lastTrailTime > 16) {
+    lastTrailTime = now;
+    lastTrailX = mx; lastTrailY = my;
+    spawnTrail(mx, my);
+  }
+});
+
+function spawnTrail(x, y) {
+  // randomly pick: coloured dot or tiny emoji
+  const useEmoji = Math.random() < 0.35;
+  const el = document.createElement('div');
+  el.className = 'trail-particle';
+
+  if (useEmoji) {
+    el.textContent = trailEmoji[Math.floor(Math.random() * trailEmoji.length)];
+    const sz = 12 + Math.random() * 14;
+    el.style.cssText += `font-size:${sz}px; background:none;`;
+  } else {
+    const sz = 4 + Math.random() * 7;
+    el.style.width  = sz + 'px';
+    el.style.height = sz + 'px';
+    el.style.background = trailCols[Math.floor(Math.random() * trailCols.length)];
+    el.style.boxShadow  = `0 0 4px ${trailCols[Math.floor(Math.random() * trailCols.length)]}`;
+  }
+
+  // scatter slightly around cursor
+  el.style.left = (x + (Math.random() - 0.5) * 14) + 'px';
+  el.style.top  = (y + (Math.random() - 0.5) * 14) + 'px';
+  el.style.animationDuration = (0.5 + Math.random() * 0.4) + 's';
+
+  document.body.appendChild(el);
+  el.addEventListener('animationend', () => el.remove());
+}
+
+// Spin the star cursor slowly on its own
+let angle = 0;
+(function spinStar() {
+  angle += 1.2;
+  starCursor.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+  requestAnimationFrame(spinStar);
+})();
+
+const cols = ['#FF1493','#FFD700','#FF69B4','#4169E1','#FF8C00','#00BFFF','#ADFF2F','#FF6347','#DA70D6','#FFE066','#FF85C2','#7DF9FF'];
+for (let i = 0; i < 65; i++) {
+  const el = document.createElement('div');
+  el.className = 'confetti-piece';
+  el.style.left   = Math.random() * 100 + 'vw';
+  el.style.top    = (Math.random() * 100 - 20) + 'vh';
+  el.style.background = cols[Math.floor(Math.random() * cols.length)];
+  const sz = 4 + Math.random() * 10;
+  el.style.width  = sz + 'px';
+  el.style.height = (Math.random() > 0.5 ? sz : sz * 2.2) + 'px';
+  el.style.borderRadius = Math.random() > 0.5 ? '50%' : '1px';
+  el.style.animationDuration  = (5 + Math.random() * 10) + 's';
+  el.style.animationDelay     = (Math.random() * 14) + 's';
+  document.body.appendChild(el);
+}
+</script>
+</body>
+</html>
