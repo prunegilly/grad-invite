@@ -596,7 +596,7 @@ body::before {
             <div class="typing-indicator" id="typingIndicator"><span class="cursor"></span></div>
           </div>
         </div>
-        <div class="screen-softkeys"><span>Options</span><span>Back</span></div>
+        <div class="screen-softkeys" id="screenSoftkeys"><span id="skLeft">Options</span><span id="skRight">Back</span></div>
       </div>
     </div>
   </div>
@@ -609,7 +609,7 @@ body::before {
 
     <!-- Call / D-Pad / End row -->
     <div class="nav-cluster">
-      <div class="btn-call">📞</div>
+      <div class="btn-call" id="btnCall">📞</div>
       <div class="dpad-ring">
         <div class="dpad-arrows">
           <span></span><span>▲</span><span></span>
@@ -617,30 +617,30 @@ body::before {
           <span></span><span>▼</span><span></span>
         </div>
       </div>
-      <div class="btn-end">📵</div>
+      <div class="btn-end" id="btnEnd">📵</div>
     </div>
 
     <!-- Softkey row -->
     <div class="softkey-row">
-      <div class="skey skey-l">MENU</div>
+      <div class="skey skey-l" id="skeyLeft">MENU</div>
       <div class="skey skey-m"></div>
-      <div class="skey skey-r">CLR</div>
+      <div class="skey skey-r" id="skeyRight">CLR</div>
     </div>
 
-    <!-- Numeric keypad -->
+    <!-- Numeric keypad — data-chars drives T9 cycling -->
     <div class="keypad">
-      <div class="key"><span class="key-num">1</span><span class="key-abc">. @ ?</span></div>
-      <div class="key"><span class="key-num">2</span><span class="key-abc">A B C</span></div>
-      <div class="key"><span class="key-num">3</span><span class="key-abc">D E F</span></div>
-      <div class="key"><span class="key-num">4</span><span class="key-abc">G H I</span></div>
-      <div class="key"><span class="key-num">5</span><span class="key-abc">J K L</span></div>
-      <div class="key"><span class="key-num">6</span><span class="key-abc">M N O</span></div>
-      <div class="key"><span class="key-num">7</span><span class="key-abc">P Q R S</span></div>
-      <div class="key"><span class="key-num">8</span><span class="key-abc">T U V</span></div>
-      <div class="key"><span class="key-num">9</span><span class="key-abc">W X Y Z</span></div>
-      <div class="key"><span class="key-sym">*</span></div>
-      <div class="key"><span class="key-num">0</span><span class="key-abc">+ space</span></div>
-      <div class="key"><span class="key-sym">#</span></div>
+      <div class="key" data-key="1" data-chars="1"><span class="key-num">1</span><span class="key-abc">. @ ?</span></div>
+      <div class="key" data-key="2" data-chars="abcABC"><span class="key-num">2</span><span class="key-abc">A B C</span></div>
+      <div class="key" data-key="3" data-chars="defDEF"><span class="key-num">3</span><span class="key-abc">D E F</span></div>
+      <div class="key" data-key="4" data-chars="ghiGHI"><span class="key-num">4</span><span class="key-abc">G H I</span></div>
+      <div class="key" data-key="5" data-chars="jklJKL"><span class="key-num">5</span><span class="key-abc">J K L</span></div>
+      <div class="key" data-key="6" data-chars="mnoMNO"><span class="key-num">6</span><span class="key-abc">M N O</span></div>
+      <div class="key" data-key="7" data-chars="pqrsPQRS"><span class="key-num">7</span><span class="key-abc">P Q R S</span></div>
+      <div class="key" data-key="8" data-chars="tuvTUV"><span class="key-num">8</span><span class="key-abc">T U V</span></div>
+      <div class="key" data-key="9" data-chars="wxyzWXYZ"><span class="key-num">9</span><span class="key-abc">W X Y Z</span></div>
+      <div class="key" data-key="*"><span class="key-sym">*</span></div>
+      <div class="key" data-key="0" data-chars=" 0"><span class="key-num">0</span><span class="key-abc">+ space</span></div>
+      <div class="key" data-key="#"><span class="key-sym">#</span></div>
     </div>
 
   </div>
@@ -797,97 +797,270 @@ const introSequence = [
   { type:'send',  text:'ill text u more deets l8r - but first... r u coming??' },
 ];
 
-// ── RSVP INPUT ───────────────────────────────────────────────
-function showRSVPInput() {
-  // remove typing indicator
-  indicator.innerHTML = '';
+// ── T9 KEYPAD ENGINE ─────────────────────────────────────────
+let t9Active     = false;   // true when keypad is listening for name input
+let t9Name       = '';      // confirmed characters so far
+let t9Pending    = '';      // character currently being cycled
+let t9PendingKey = null;    // which key is being cycled
+let t9PendingIdx = 0;       // current cycle index
+let t9Timer      = null;    // commit timer
+let t9DisplayEl  = null;    // the element showing typed text on screen
+let t9Phase      = 'name';  // 'name' | 'rsvp'
 
-  // build a mini input row inside the screen-track
-  const inputRow = document.createElement('div');
-  inputRow.id = 'rsvp-input-row';
-  inputRow.style.cssText = `
-    display:flex; gap:4px; align-items:center;
-    padding: 3px 0 2px;
-    flex-shrink:0;
-  `;
+const T9_COMMIT_DELAY = 900; // ms before a pending char is committed
 
-  const inp = document.createElement('input');
-  inp.type = 'text';
-  inp.placeholder = 'ur name...';
-  inp.maxLength = 30;
-  inp.style.cssText = `
-    flex:1; font-family:monospace; font-size:10px;
-    background:#1e3800; color:#b8df8a;
-    border:1px solid #4a8814; border-radius:4px;
-    padding:3px 5px; outline:none;
-    min-width:0;
-  `;
-
-  const sendBtn = document.createElement('button');
-  sendBtn.textContent = 'YES';
-  sendBtn.style.cssText = `
-    font-family:monospace; font-size:9px; font-weight:bold;
-    background:#4a8814; color:#0a1e00;
-    border:1px solid #2a5000; border-radius:4px;
-    padding:3px 5px; cursor:pointer; flex-shrink:0;
-  `;
-
-  const noBtn = document.createElement('button');
-  noBtn.textContent = 'NO';
-  noBtn.style.cssText = `
-    font-family:monospace; font-size:9px; font-weight:bold;
-    background:#660010; color:#ffaaaa;
-    border:1px solid #440008; border-radius:4px;
-    padding:3px 5px; cursor:pointer; flex-shrink:0;
-  `;
-
-  inputRow.appendChild(inp);
-  inputRow.appendChild(sendBtn);
-  inputRow.appendChild(noBtn);
-  track.appendChild(inputRow);
+function t9UpdateDisplay() {
+  if (!t9DisplayEl) return;
+  // show confirmed + pending with blinking cursor on pending
+  t9DisplayEl.innerHTML =
+    escapeHtml(t9Name) +
+    (t9Pending
+      ? `<span style="background:#2a4a00;color:#b8df8a;border-radius:2px;padding:0 1px">${escapeHtml(t9Pending)}</span>`
+      : '') +
+    '<span class="cursor"></span>';
   pinToBottom();
-  inp.focus();
+}
 
-  // prompt bubble above the input
-  const prompt = document.createElement('div');
-  prompt.className = 'msg-bubble';
-  prompt.textContent = 'type ur name + tap YES or NO';
-  prompt.style.fontSize = '9.5px';
-  track.insertBefore(prompt, inputRow);
-  pinToBottom();
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 
-  async function handleRSVP(attending) {
-    const name = inp.value.trim() || 'mystery guest';
-    inputRow.remove();
-    prompt.remove();
+function t9CommitPending() {
+  if (t9Pending) {
+    t9Name += t9Pending;
+    t9Pending    = '';
+    t9PendingKey = null;
+    t9PendingIdx = 0;
+    t9UpdateDisplay();
+  }
+}
 
-    // show their reply bubble
-    addBubble('reply', attending
-      ? name + ' - ill be there!!'
-      : name + ' - cant make it :('
-    );
+function t9PressKey(keyEl) {
+  if (!t9Active || t9Phase !== 'name') return;
 
-    await pause(400);
-    saveRSVP(name, attending ? 'yes' : 'no');
+  const k     = keyEl.dataset.key;
+  const chars = keyEl.dataset.chars || '';
 
-    if (attending) {
-      await sendMessage('send', 'YESSS omg I cant wait to see u there!!', 40);
-      await pause(600);
-      await sendMessage('send', 'more deets coming soon - watch this space', 40);
-    } else {
-      await sendMessage('send', 'nooo we will miss u!! ill send pics after', 40);
+  // * = backspace
+  if (k === '*') {
+    clearTimeout(t9Timer);
+    if (t9Pending) {
+      t9Pending = ''; t9PendingKey = null; t9PendingIdx = 0;
+    } else if (t9Name.length > 0) {
+      t9Name = t9Name.slice(0, -1);
     }
-
-    await pause(500);
-    indicator.innerHTML = '';
-    pinToBottom();
+    t9UpdateDisplay();
+    t9FlashKey(keyEl);
+    return;
   }
 
-  sendBtn.addEventListener('click', () => handleRSVP(true));
-  noBtn.addEventListener('click',  () => handleRSVP(false));
-  inp.addEventListener('keydown', e => {
-    if (e.key === 'Enter') handleRSVP(true);
+  // # = confirm name, move to yes/no
+  if (k === '#') {
+    clearTimeout(t9Timer);
+    t9CommitPending();
+    if (t9Name.trim().length > 0) t9ConfirmName();
+    return;
+  }
+
+  // 0 = space
+  if (k === '0') {
+    clearTimeout(t9Timer);
+    t9CommitPending();
+    t9Name += ' ';
+    t9UpdateDisplay();
+    t9FlashKey(keyEl);
+    return;
+  }
+
+  if (!chars) return;
+
+  t9FlashKey(keyEl);
+
+  // same key tapped again — cycle
+  if (t9PendingKey === k) {
+    clearTimeout(t9Timer);
+    t9PendingIdx = (t9PendingIdx + 1) % chars.length;
+    t9Pending    = chars[t9PendingIdx];
+  } else {
+    // different key — commit previous pending first
+    t9CommitPending();
+    t9PendingKey = k;
+    t9PendingIdx = 0;
+    t9Pending    = chars[0];
+  }
+
+  t9UpdateDisplay();
+
+  // auto-commit after delay
+  t9Timer = setTimeout(() => {
+    t9CommitPending();
+  }, T9_COMMIT_DELAY);
+}
+
+function t9FlashKey(keyEl) {
+  keyEl.style.filter = 'brightness(1.6)';
+  setTimeout(() => { keyEl.style.filter = ''; }, 120);
+}
+
+async function t9ConfirmName() {
+  // switch to yes/no phase
+  t9Phase = 'rsvp';
+  const name = t9Name.trim() || 'mystery guest';
+
+  // update screen display to show full name cleanly
+  t9DisplayEl.innerHTML = escapeHtml(name);
+  pinToBottom();
+
+  await pause(300);
+
+  // update softkeys and screen prompt
+  document.getElementById('skLeft').textContent  = 'YES';
+  document.getElementById('skRight').textContent = 'NO';
+  document.getElementById('skeyLeft').textContent  = 'YES';
+  document.getElementById('skeyRight').textContent = 'NO';
+
+  // swap prompt text
+  const promptEl = document.getElementById('t9Prompt');
+  if (promptEl) promptEl.textContent = 'coming to grad day?';
+  pinToBottom();
+
+  // wire up yes/no — softkey divs AND call/end buttons
+  function handleYes() { if (t9Phase === 'rsvp') t9Submit(name, true); }
+  function handleNo()  { if (t9Phase === 'rsvp') t9Submit(name, false); }
+
+  document.getElementById('skeyLeft').onclick  = handleYes;
+  document.getElementById('skLeft').onclick    = handleYes;
+  document.getElementById('btnCall').onclick   = handleYes;
+  document.getElementById('skeyRight').onclick = handleNo;
+  document.getElementById('skRight').onclick   = handleNo;
+  document.getElementById('btnEnd').onclick    = handleNo;
+}
+
+async function t9Submit(name, attending) {
+  t9Active = false;
+  t9Phase  = 'done';
+
+  // reset softkeys
+  document.getElementById('skLeft').textContent   = 'Options';
+  document.getElementById('skRight').textContent  = 'Back';
+  document.getElementById('skeyLeft').textContent = 'MENU';
+  document.getElementById('skeyRight').textContent= 'CLR';
+  document.getElementById('skeyLeft').onclick  = null;
+  document.getElementById('skeyRight').onclick = null;
+  document.getElementById('skLeft').onclick    = null;
+  document.getElementById('skRight').onclick   = null;
+  document.getElementById('btnCall').onclick   = null;
+  document.getElementById('btnEnd').onclick    = null;
+
+  // remove the typing UI
+  const ui = document.getElementById('t9UI');
+  if (ui) ui.remove();
+
+  // show their reply
+  addBubble('reply', attending
+    ? name + ' - ill be there!!'
+    : name + ' - cant make it :('
+  );
+
+  await pause(400);
+  saveRSVP(name, attending ? 'yes' : 'no');
+
+  if (attending) {
+    await sendMessage('send', 'YESSS omg I cant wait to see u there!!', 40);
+    await pause(600);
+    await sendMessage('send', 'more deets coming soon - watch this space', 40);
+  } else {
+    await sendMessage('send', 'nooo we will miss u!! ill send pics after', 40);
+  }
+
+  indicator.innerHTML = '';
+  pinToBottom();
+}
+
+// ── SHOW RSVP INPUT (T9 mode) ────────────────────────────────
+function showRSVPInput() {
+  indicator.innerHTML = '';
+
+  // prompt bubble
+  const prompt = document.createElement('div');
+  prompt.id = 't9Prompt';
+  prompt.className = 'msg-bubble';
+  prompt.textContent = 'type ur name using the keys';
+  prompt.style.fontSize = '9px';
+  track.insertBefore(prompt, indicator);
+
+  // typing display row
+  const ui = document.createElement('div');
+  ui.id = 't9UI';
+  ui.style.cssText = `
+    display:flex; align-items:center; gap:4px;
+    padding: 2px 0; flex-shrink:0;
+  `;
+
+  const label = document.createElement('span');
+  label.style.cssText = 'font-family:monospace;font-size:9px;color:#2a5000;flex-shrink:0;';
+  label.textContent = '>';
+
+  const display = document.createElement('span');
+  display.style.cssText = `
+    font-family:monospace; font-size:10px;
+    color:#b8df8a; background:#1e3800;
+    border-radius:4px; padding:2px 5px;
+    flex:1; min-width:0; min-height:16px;
+    display:inline-block;
+  `;
+  display.innerHTML = '<span class="cursor"></span>';
+  t9DisplayEl = display;
+
+  ui.appendChild(label);
+  ui.appendChild(display);
+  track.insertBefore(ui, indicator);
+  pinToBottom();
+
+  // hint below
+  const hint = document.createElement('div');
+  hint.style.cssText = 'font-family:monospace;font-size:8px;color:#3a6a00;flex-shrink:0;';
+  hint.textContent = '* del  0 space  # send';
+  track.insertBefore(hint, indicator);
+  pinToBottom();
+
+  // activate keypad
+  t9Active = true;
+  t9Phase  = 'name';
+  t9Name   = '';
+  t9Pending = '';
+  t9PendingKey = null;
+
+  // bind all keys
+  document.querySelectorAll('.key').forEach(k => {
+    k.style.cursor = 'pointer';
+    k.addEventListener('click', () => t9PressKey(k));
   });
+
+  // also allow physical keyboard for convenience on desktop
+  document.addEventListener('keydown', t9PhysicalKey);
+}
+
+function t9PhysicalKey(e) {
+  if (!t9Active) return;
+  const map = {'2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9','0':'0','*':'*','#':'#',' ':'0'};
+  const numpad = {'Numpad2':'2','Numpad3':'3','Numpad4':'4','Numpad5':'5','Numpad6':'6','Numpad7':'7','Numpad8':'8','Numpad9':'9','Numpad0':'0'};
+  const k = map[e.key] || numpad[e.code];
+  if (k) {
+    e.preventDefault();
+    const keyEl = document.querySelector(`.key[data-key="${k}"]`);
+    if (keyEl) t9PressKey(keyEl);
+  }
+  if (e.key === 'Backspace') {
+    e.preventDefault();
+    const star = document.querySelector('.key[data-key="*"]');
+    if (star) t9PressKey(star);
+  }
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const hash = document.querySelector('.key[data-key="#"]');
+    if (hash) t9PressKey(hash);
+  }
 }
 
 // ── RUN ──────────────────────────────────────────────────────
