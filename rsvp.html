@@ -184,33 +184,9 @@ h1 {
 }
 .back-link:hover { color: #fff; }
 
-/* TODO banner */
-.todo-banner {
-  position: relative; z-index: 1;
-  background: rgba(255,215,0,0.15);
-  border: 2px dashed #FFD700;
-  border-radius: 14px;
-  padding: 12px 16px;
-  margin-bottom: 20px;
-  width: 100%;
-  max-width: 480px;
-  font-family: 'Caveat', cursive;
-  font-size: 15px;
-  font-weight: 700;
-  color: #FFD0A0;
-  letter-spacing: 0.5px;
-  line-height: 1.5;
-}
-.todo-banner strong { color: #FFD700; }
 </style>
 </head>
 <body>
-
-<div class="todo-banner">
-  <strong>NOTE FOR LATER:</strong> RSVPs are currently saved in your browser's local storage.
-  When you hook up a real backend (post-exam!), replace the <code>loadRSVPs()</code> call
-  below with a fetch to your API and this page will show everyone's RSVPs live.
-</div>
 
 <div class="card">
   <h1>RSVP List</h1>
@@ -229,7 +205,7 @@ h1 {
 
   <div class="section-label">Responses</div>
   <ul class="rsvp-list" id="rsvpList">
-    <li class="empty-msg" id="emptyMsg">no RSVPs yet... share the link!</li>
+    <li class="empty-msg" id="emptyMsg">loading...</li>
   </ul>
 
   <button class="btn-clear" id="btnClear">clear all RSVPs</button>
@@ -238,16 +214,15 @@ h1 {
 <a class="back-link" href="index.html">back to invite</a>
 
 <script>
-const RSVP_KEY = 'grad_rsvp_list';
+const API_BASE = 'https://grad-invite-api.onrender.com';
 
-function loadRSVPs() {
-  // TODO (post-exam): replace with fetch('/api/rsvps') or your backend call
-  try { return JSON.parse(localStorage.getItem(RSVP_KEY)) || []; }
-  catch { return []; }
+async function loadRSVPs() {
+  const res = await fetch(`${API_BASE}/api/rsvps`);
+  if (!res.ok) throw new Error(`request failed: ${res.status}`);
+  return res.json();
 }
 
-function render() {
-  const list = loadRSVPs();
+function renderList(list) {
   const listEl  = document.getElementById('rsvpList');
   const emptyEl = document.getElementById('emptyMsg');
   const yesEl   = document.getElementById('countYes');
@@ -264,17 +239,13 @@ function render() {
 
   if (list.length === 0) {
     emptyEl.style.display = 'block';
+    emptyEl.textContent = 'no RSVPs yet... share the link!';
     return;
   }
   emptyEl.style.display = 'none';
 
-  // sort: yes first, then by timestamp newest last
-  const sorted = [...list].sort((a,b) => {
-    if (a.status !== b.status) return a.status === 'yes' ? -1 : 1;
-    return new Date(a.timestamp) - new Date(b.timestamp);
-  });
-
-  sorted.forEach(r => {
+  // already sorted yes-first by the API; just render in order
+  list.forEach(r => {
     const li = document.createElement('li');
     li.className = 'rsvp-item';
 
@@ -285,7 +256,7 @@ function render() {
 
     const timeSpan = document.createElement('div');
     timeSpan.className = 'rsvp-time';
-    timeSpan.textContent = new Date(r.timestamp).toLocaleString('en-AU', {
+    timeSpan.textContent = new Date(r.created_at).toLocaleString('en-AU', {
       day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'
     });
 
@@ -302,10 +273,36 @@ function render() {
   });
 }
 
-document.getElementById('btnClear').addEventListener('click', () => {
-  if (confirm('Clear all RSVPs? This cannot be undone.')) {
-    localStorage.removeItem(RSVP_KEY);
+async function render() {
+  const emptyEl = document.getElementById('emptyMsg');
+  emptyEl.style.display = 'block';
+  emptyEl.textContent = 'loading...';
+
+  try {
+    const list = await loadRSVPs();
+    renderList(list);
+  } catch (err) {
+    console.log('failed to load RSVPs:', err);
+    document.getElementById('rsvpList').querySelectorAll('.rsvp-item').forEach(el => el.remove());
+    emptyEl.style.display = 'block';
+    emptyEl.textContent = "couldn't load RSVPs - try refreshing";
+  }
+}
+
+document.getElementById('btnClear').addEventListener('click', async () => {
+  if (!confirm('Clear all RSVPs? This cannot be undone.')) return;
+  const secret = prompt('Enter clear secret:');
+  if (!secret) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/rsvps`, {
+      method: 'DELETE',
+      headers: { 'X-Clear-Secret': secret },
+    });
+    if (!res.ok) throw new Error(`request failed: ${res.status}`);
     render();
+  } catch (err) {
+    console.log('failed to clear RSVPs:', err);
+    alert("couldn't clear RSVPs - check the secret and try again");
   }
 });
 

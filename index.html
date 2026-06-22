@@ -718,22 +718,19 @@ for (let i = 0; i < count; i++) {
   layer.appendChild(el);
 }
 
-// ── RSVP STORAGE KEY ─────────────────────────────────────────
-// TODO (post-exam): swap localStorage calls with real backend API
-const RSVP_KEY = 'grad_rsvp_list';
+// ── RSVP API ──────────────────────────────────────────────────
+const API_BASE = 'https://grad-invite-api.onrender.com';
 
-function loadRSVPs() {
-  try { return JSON.parse(localStorage.getItem(RSVP_KEY)) || []; }
-  catch { return []; }
-}
-
-function saveRSVP(name, status) {
-  const list = loadRSVPs();
-  // avoid duplicates by name (case-insensitive)
-  const existing = list.findIndex(r => r.name.toLowerCase() === name.toLowerCase());
-  const entry = { name, status, timestamp: new Date().toISOString() };
-  if (existing >= 0) list[existing] = entry; else list.push(entry);
-  localStorage.setItem(RSVP_KEY, JSON.stringify(list));
+async function saveRSVP(name, status) {
+  try {
+    await fetch(`${API_BASE}/api/rsvp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, status }),
+    });
+  } catch (err) {
+    console.log('rsvp backend unreachable, skipping save:', err);
+  }
 }
 
 // ── SCREEN HELPERS ───────────────────────────────────────────
@@ -922,12 +919,28 @@ async function t9Submit(name, attending) {
   );
 
   await pause(400);
-  saveRSVP(name, attending ? 'yes' : 'no');
+  await saveRSVP(name, attending ? 'yes' : 'no');
 
   if (attending) {
     await sendMessage('send', 'YESSS omg I cant wait to see u there!!', 40);
     await pause(600);
-    await sendMessage('send', 'more deets coming soon - watch this space', 40);
+    await sendMessage('send', 'ok heres the full rundown for the day', 40);
+    await pause(500);
+    await sendMessage('send', 'lunch 11am', 40);
+    await pause(400);
+    await sendMessage('send', 'cap and gown pickup 12pm', 40);
+    await pause(400);
+    await sendMessage('send', 'photos 12:30pm', 40);
+    await pause(400);
+    await sendMessage('send', 'ceremony 3pm at uq centre', 40);
+    await pause(400);
+    await sendMessage('send', 'photos round 2 at 5pm', 40);
+    await pause(400);
+    await sendMessage('send', 'drinks 6:30pm (location tbc)', 40);
+    await pause(400);
+    await sendMessage('send', 'dinner 7pm', 40);
+    await pause(600);
+    await sendMessage('send', 'see u there!!', 40);
   } else {
     await sendMessage('send', 'nooo we will miss u!! ill send pics after', 40);
   }
