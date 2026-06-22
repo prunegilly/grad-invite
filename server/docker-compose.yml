@@ -1,0 +1,14 @@
+services:
+  grad-invite-api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - CLEAR_SECRET=${CLEAR_SECRET}
+      - DB_PATH=/data/data.db
+    volumes:
+      - grad-data:/data
+
+volumes:
+  grad-data:
